@@ -2,16 +2,61 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+int crawl(int * arr, int arrSize, int index){
+
+    int multiplier = 1;
+    int val = arr[index];
+    
+    int i = index;
+    while(arr[i+1] == val){
+        i++;
+        multiplier++;
+    }
+    i = index;
+    while(arr[i-1] == val){
+        i--;
+        multiplier++;
+    }
 
 
-int calculateSimilarityScore(int * leftArr, int * rightArr, int val){
+    return multiplier;
+}
+
+int calculateSimilarityScore(int * arr,int arrSize, int val){
+
+    int multiplier = 0;
 
     // Because the lists are ordered, we should be able to just find the value, count instances
     // and then stop traversing the array
 
+    // This is few lines but INSANELY SLOW
+    // int i = 0;
+    // while(i<arrSize){
+    //     if(arr[i]>val) break;
+    //     if(arr[i]==val) multiplier ++;
+    // }
+    // So of course we need to use a search algorithm, hit em with the binary search brother
+   
+    int max = arrSize;
+    int min = 0;
 
+    while(min<=max){
+        int pivot = min +(max-min)/2;
 
-    return;
+        if(arr[pivot] == val){
+            multiplier = crawl(arr, arrSize,pivot);
+            break;
+        }else if(arr[pivot] > val){
+            max = pivot - 1;
+        }else{
+            min = pivot + 1;
+        }
+
+    }
+
+    // If we hit a bogey, crawl up and down in both directions until you hit a different value or arr bounds
+
+    return val * multiplier;
 }
 
 int distance(int a, int b) {
@@ -79,16 +124,14 @@ int main() {
 
     printf("Total distance traveled: %d\n", distanceTraveled);
 
-
-
-    // Here we examine the similarity score between the left list and right list
-    // Go over each index, count number of time it appears in right
-    // add to total
-
+    
+    // Calculate left val * number of occurences in right array
     int similarityScore = 0;
     for (int i = 0; i < fileSize; i++) {
-        similarityScore +=calculateSimilarityScore(leftArray, rightArray,leftArray[i]);   
+        similarityScore += calculateSimilarityScore(rightArray, fileSize,leftArray[i]);
     }
+
+    printf("Total similarity score: %d\n", similarityScore);
 
 
     // Cleanup
