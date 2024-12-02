@@ -4,97 +4,98 @@
 
 
 
-void quickSort(){
+int calculateSimilarityScore(int * leftArr, int * rightArr, int val){
 
+    // Because the lists are ordered, we should be able to just find the value, count instances
+    // and then stop traversing the array
+
+
+
+    return;
 }
 
+int distance(int a, int b) {
+    return (a > b) ? (a - b) : (b - a);
+}
 
-int main (){
+void mutantInsertionSort(int *arr, int len, int val) {
+    int i = len;
+    int j = i - 1;
 
-    // Read the file to the end, using the tricky C filereading trick where you go to the bottom and jump back up
-    // Find the amount of \n in the file, that should be the length of the arrays
-    // Or if we add up all the numbers from each column in the data, then subtract the smaller one from the higher that that should be the distance?
+    while (j >= 0 && arr[j] > val) {
+        arr[j + 1] = arr[j];
+        j--;
+    }
+    arr[j + 1] = val;
+}
 
+int main() {
     FILE *fptr;
-    char* line = NULL;
+    size_t len = 0;
+    char *line = NULL;
 
-    // Open a file in read mode
+    // Open the file in read mode
     fptr = fopen("TestData/day1.txt", "r");
-    if(fptr == NULL){
-        perror("Error operning file");
+    if (fptr == NULL) {
+        perror("Error opening file");
         return 1;
     }
 
-    // Get the amount of entries I'll need to put in my arrays
-    int fileSize = 0; 
-    while(getline(line) != -1){
+    // Count lines to determine array size
+    int fileSize = 0;
+    while (getline(&line, &len, fptr) != -1) {
         fileSize++;
     }
     fseek(fptr, 0, SEEK_SET);
 
-    int * leftArray = malloc(fileSize * sizeof(int));
-    int * rightArray = malloc(fileSize * sizeof(int));
+    // Allocate arrays
+    int *leftArray = malloc(fileSize * sizeof(int));
+    int *rightArray = malloc(fileSize * sizeof(int));
+    if (!leftArray || !rightArray) {
+        perror("Memory allocation failed");
+        fclose(fptr);
+        free(line);
+        return 1;
+    }
 
-    int length1;
-    int length2;
-
-
-    // Should I sort the array as I'm adding values to it?
-    // Is that even possible in a timely manner?
-    // Can I merge sort as I go?
-    // Is the step in a quick sort more appropriate
-
-
-
-    // Collect the values from the file, add them to arrays
+    // Collect values from the file
     int arrayTraverse = 0;
-    while(arrayTraverse < fileSize){
-        size_t read = getline(line, stdin);
-        
-        //Read each number backwards, times each number by 10 * reverse index
-        int tens = 1;
-        bool space = false;
-        for(int i = read; i>=0;i++){
-            int num = line[i] * tens;
+    while (arrayTraverse < fileSize && getline(&line, &len, fptr) != -1) {
+        int length1 = 0, length2 = 0;
+        sscanf(line, "%d %d", &length1, &length2);
 
-            if(line[i] == ' '){
-                space = true;
-                continue;
-            }else if (space == false){
-                length1 += num; 
-            }else{
-                length2 += num;
-            }
-        
-            tens *=10; 
-        }
+        // Sort arrays while adding values
+        mutantInsertionSort(leftArray, arrayTraverse, length1);
+        mutantInsertionSort(rightArray, arrayTraverse, length2);
 
-        leftArray[arrayTraverse] = length1;
-        rightArray[arrayTraverse] = length2;
+        arrayTraverse++;
+    }
 
-        if(feof(fptr)){
-            break;
-        }
+    // Calculate distance
+    int distanceTraveled = 0;
+    for (int i = 0; i < fileSize; i++) {
+        distanceTraveled += distance(leftArray[i], rightArray[i]);
+    }
+
+    printf("Total distance traveled: %d\n", distanceTraveled);
+
+
+
+    // Here we examine the similarity score between the left list and right list
+    // Go over each index, count number of time it appears in right
+    // add to total
+
+    int similarityScore = 0;
+    for (int i = 0; i < fileSize; i++) {
+        similarityScore +=calculateSimilarityScore(leftArray, rightArray,leftArray[i]);   
     }
 
 
-    // Sort both arrays
-
-    // Calculate distance between the two
-    arrayTraverse = 0;
-    while()
-
-    
-
-
-    // Create 2 lists of scaleable length
-
-    // Open test data file
-
-    // Order the 2 lists
-
-    // Compare each index of both lists, subtract the larger number from the smaller one
-
+    // Cleanup
+    fclose(fptr);
+    free(leftArray);
+    free(rightArray);
+    free(line);
 
     return 0;
 }
